@@ -18,7 +18,7 @@ qrep <- function(x){
 rm(list=ls())
 gc()
 
-# importing our main data. this database contains informations regarding brazilian mayors election. 
+# importing our main data and setting it. this database contains informations regarding brazilian mayors election. 
 dado <- vroom("municipality_panel.txt") # https://vroom.r-lib.org/articles/benchmarks.html
 
 dado <- dado %>% filter(year >= 2006) # cleaning the data a little
@@ -40,3 +40,31 @@ ln <- dado %>% select(ends_with("finbra")) %>% ln() %>%
 dado <- cbind(dado,ln)
 
 rm(ln) # cleaning the environment
+
+dado$ln_gdp <- ln(dado$gdp)
+dado$ln_muni_expenses <- ln(dado$muni_expenses)
+dado$ln_empl <- ln(dado$nr_empl)
+
+dado$higher_spending_cap <-ifelse(dado$max_despesa2012 >= 142858, 1,0) # this is the dummy used in the RDD. if the compaing spending in 2012 was higher than 142858 (a value defined by the brazilian supreme court)
+dado$higher_spending_cap[is.na(dado$higher_spending_cap)] <- 0  # changing NA to zero
+
+dado$diff <- log(dado$max_despesa2012) - log(142858) # taking the difference between max spending and the log of the exogenous cap. useful later if want to trim/limitate the RDD to values close to the discontinuity.
+ 
+dado$burocratic <- (dado$legislative_finbra+dado$judiciary_finbra+dado$justice_finbra+dado$administration_finbra) # burocratic spendings
+dado$burocratic <- (dado$burocratic/dado$muni_expenses) # burocratic spendings as fraction of total spending
+dado$frac <-  (dado$health_finbra+dado$education_finbra)/dado$muni_expenses # spending on health and education as fraction of total spending
+
+dado$diff_votos <- log(dado$votos_primeiro_colocado/dado$votos_segundo_colocado) # difference of votes between the first and the second candidate (our measure of political competition)
+
+dado[] <- Map(function(x) replace(x, is.infinite(x), 0), dado) # replacing inf from the ln to zero
+
+dat2 <- dado %>% select(starts_with("ln_"),frac,burocratic,diff_votos) %>% qrep(.) # applying the outliers function
+            
+dado[names(dat2)] <- dat2 # returning them to the initial dataframe (faster that way)
+rm(dat2,qrep)
+              
+fwrite(dado,"dado.csv") # clean data. ready to be used on replicating the paper.
+
+##### Replicating the paper --------
+subdado <- dado %>% filter(year == 2017 ) #como abs diff <1?
+
