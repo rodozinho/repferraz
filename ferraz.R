@@ -14,7 +14,7 @@ qrep <- function(x){
   x
 }
 
-# Cleaning environment
+# Cleaning the environment
 rm(list=ls())
 gc()
 
