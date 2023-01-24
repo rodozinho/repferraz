@@ -66,5 +66,16 @@ rm(dat2,qrep)
 fwrite(dado,"dado.csv") # clean data. ready to be used on replicating the paper.
 
 ##### Replicating the paper --------
-subdado <- dado %>% filter(year == 2017 ) #como abs diff <1?
+subdado <- dado %>% filter(year == 2017)
+feols(nr_candidatos ~ higher_spending_cap| uf, data = subdado, cluster = subdado$ibge) # federative unit fixed effect
+feols(nr_candidatos ~ higher_spending_cap + diff:i(higher_spending_cap)|uf, data = subdado, cluster = subdado$ibge) # varying slope (using diff)
+feols(nr_candidatos ~ higher_spending_cap + diff2:i(higher_spending_cap)+diff:i(higher_spending_cap)| uf, 
+      data = subdado %>% dplyr::mutate(diff2=diff*diff) , cluster = subdado$ibge)
+              
+ggplot(data=subdado %>% filter(year==2017,!is.na(higher_spending_cap)), # plotting
+aes(y=nr_candidatos))+ ggtitle("Dummy higher_spending_cap") +
+  geom_boxplot()+facet_grid(~higher_spending_cap) + theme(axis.title.x=element_blank(),
+                                                                                     axis.text.x=element_blank(),
+                                                                                     axis.ticks.x=element_blank())
+              
 
