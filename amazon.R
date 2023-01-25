@@ -19,7 +19,8 @@ desmatamento_municipio <- read_excel("desmatamento_municipio.xltx",  # this xltx
 desmatamento_municipio <- desmatamento_municipio %>% filter(ano >= 2006) # deforestation only from 2006
 desmatamento_municipio <- desmatamento_municipio %>% dplyr::rename(code_muni = id_municipio) #fixing the municipality code name
 
-# creating normalized and ln deforestation increase
+# creating normalized by hand [could do: desmatamento_municipio %>% mutate_at(c("incremento"), ~(scale(.) %>% as.vector)) but that way I can make every step clear] and ln deforestation increase
+
 as.numeric(desmatamento_municipio$incremento) -> desmatamento_municipio$incremento
 mnincremento <- aggregate((desmatamento_municipio$incremento), by = list(desmatamento_municipio$code_muni)
                           , FUN=mean) 
@@ -38,3 +39,18 @@ base <- base %>% dplyr::select(ano, code_muni,incremento,desm_norm)
 base$ln_incremento <- ln(base$incremento)
 
 rm(list=setdiff(ls(), "base")) # cleaning the environment
+
+# importing a list of municipalities inside the amazon rainforest which are "blacklisted" i.e. have a harsher monitoring by the federal government
+lista_prioritaria <- read_excel("lista prioritaria.xlsx")
+base <- left_join(base, lista_prioritaria, by = c("ano","code_muni")) # cbinding with deforestation and export
+base <- base %>% mutate_at(vars(-c(mes)), ~replace(., is.na(.), 0))
+
+# municipality area column
+area_mun <- read_excel("area_mun.xlsx", col_types = c("numeric","numeric"))
+base <- left_join(base,area_mun, by = "code_muni") 
+
+rm(list=setdiff(ls(), "base")) 
+
+UC_area <- read_excel("UC_TI_area.xlsx")
+UC_area <- UC_area %>% filter(amz_legal==1)
+UC_area$ano <- as.numeric(UC_area$ano)
