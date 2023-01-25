@@ -6,6 +6,7 @@ if (!require("pacman")) install.packages("pacman")
 p_load(ggplot2,tidyverse,fixest,vroom,SciViews,scales,caret, cowplot,data.table,deflateBR,
        modelsummary,openxlsx,vtable,readxl,rdd, jtools,gridExtra)
 
+wd <- "C:/example/" # setting wd
 # Defining a function to trim outliers. you can choose the quantile according to your research design
 qrep <- function(x){ 
   quantiles <- quantile(x, c(.01, .99 ),na.rm=T)
@@ -79,3 +80,21 @@ aes(y=nr_candidatos))+ ggtitle("Dummy higher_spending_cap") +
                                                                                      axis.ticks.x=element_blank())
               
 
+##### Now that I've replicated the paper, let's try to expand it. Is there some relationship between political competition and environmental issues? ------
+
+# First, we will try to understand how competition affects emission, for all municipalities. 
+vroom("emissoes.csv") -> emissoes
+subdado <- subdado %>% left_join(.,emissoes,by=c("year","ibge"))
+
+feols(log(emissao_co2) ~ higher_spending_cap:post| 
+        sw(ibge + year,
+           ibge+ meso^year,
+           ibge + micro^year), data = subdado,
+      cluster = "ibge") -> a
+b<-modelsummary(a,output="data.frame",stars=TRUE)
+addWorksheet(wb, "emissao")
+writeData(wb, "emissao", b, startRow = 1, startCol = 1)
+saveWorkbook(wb, file = paste0(wd,Sys.Date(),"_results.xlsx"), overwrite = TRUE)
+
+# What if we want to see only for municipalities inside the Legal Amazon?
+ 
