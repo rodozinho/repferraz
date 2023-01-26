@@ -179,3 +179,4 @@ nig_map <- get_stamenmap( #getting Nigeria's map coord
 ggmap(nig_map)+geom_point(data= subs,aes(x = lon,y=lat,color=indicator))+scale_color_viridis_c(option = "magma")+
   theme_map()+labs(title="Figure 2") 
 
+### Now what about blacklisting and accumulated deforestation? What is the historical pattern of deforestation?
