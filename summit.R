@@ -6,8 +6,8 @@
 #---- Google trend ----
 # First, lets use Google trend to see how, historically, some keywords have behaved. I will define a few words/expressions that will be used during this short experiment:
 
-# 1 - "Eco-socialism" (and its variations)
-# 2 - "Marxism" (and its variations)
-# 3 - A small list of relevant eco-socialists (Foster, Lowy, malm, altvater, kohei saito, hickel). no politicians
-# 4 - Anthropocene
-# 5 - degrowth
+# 1 - "Eco-socialism" (and its variations);
+# 2 - "Marxism" (and its variations);
+# 3 - A small list of relevant eco-socialists (Foster, Lowy, malm, altvater, kohei saito, hickel). no politicians to not create spurious noise;
+# 4 - Anthropocene;
+# 5 - Degrowth;
