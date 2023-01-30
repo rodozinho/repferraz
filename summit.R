@@ -3,4 +3,11 @@
 # using textual analysis, webscrapping and machine learning.
 # I will also be using it to understand how to sync R and GitHub.
 
-# First, lets use Google trend to see how, historically, some keywords have behaved. I will define five words/expressions that will be used during this short experiment. First, 
+#---- Google trend ----
+# First, lets use Google trend to see how, historically, some keywords have behaved. I will define a few words/expressions that will be used during this short experiment:
+
+# 1 - "Eco-socialism" (and its variations)
+# 2 - "Marxism" (and its variations)
+# 3 - A small list of relevant eco-socialists (Foster, Lowy, malm, altvater, kohei saito, hickel). no politicians
+# 4 - Anthropocene
+# 5 - degrowth
