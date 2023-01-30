@@ -6,8 +6,8 @@ if (!require("pacman")) install.packages("pacman")
 p_load(ggplot2,tidyverse,fixest,vroom,SciViews,scales,caret, cowplot,data.table,deflateBR,
        modelsummary,openxlsx,vtable,readxl,rdd, jtools,gridExtra)
 
-wd <- "C:/example/" # setting wd
-setwd(dir)
+wd <- "C:/Users/example" # setting wd
+setwd(wd)
 
 # Cleaning the environment
 rm(list=ls())
