@@ -1,5 +1,4 @@
 # it is useful to get to know the paper being replicated here as I won't explain every step taken. However, in general, the authors use an exogenous cap created by the brazilian Supreme Court to understand how campaing spendings affect political competition.
-TESTE!!
 ### Importing all (and more) required packages
 
 if (!require("pacman")) install.packages("pacman")
