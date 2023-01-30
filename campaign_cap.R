@@ -71,7 +71,7 @@ ggplot(data=subdado %>% select(nr_candidatos,higher_spending_cap,year) %>% filte
        %>% mutate(across(c(1:3),qrep)), # plotting
        aes(y=nr_candidatos))+ ggtitle("Number of candidates for higher spending cap") +
   geom_boxplot()+facet_grid(~higher_spending_cap) + theme(axis.title.x=element_blank(),
-                                                          axis.text.x=element_blank(),
+                                                          axis.text.x=element_blank())
 
 # Defining a function to trim outliers. you can choose the quantile according to your research design
 qrep <- function(x){ 
