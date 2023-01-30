@@ -8,4 +8,6 @@ The first file "campaign_cap.R" tries to replicate the paper "Money and Politics
 The second file "amazon.R" contains an analysis of deforestation of the Brazilian Amazon Rainforest, part of my master's dissertation.
 <!--print a few reproduction outputs and graphs-->
 
+The last file "summit.R" tries to see if there is some relationship between environmental conferences/summits and the raise of radical leftist perspectives regarding environmental issues.
+
 None of the .xlsx, .txt and .csv used on these codes are in the repository. If you want, you can request them to me! 

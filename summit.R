@@ -3,3 +3,4 @@
 # using textual analysis, webscrapping and machine learning.
 # I will also be using it to understand how to sync R and GitHub.
 
+# First, lets use Google trend to see how, historically, some keywords have behaved. I will define five words/expressions that will be used during this short experiment. First, 
