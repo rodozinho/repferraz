@@ -1,7 +1,13 @@
+
 # in this file, I will try to see if there is some relationship between environmental conferences/summit and the raise of a marxist view on environmental issues.
 # my hypothesis is that by seeing how incapable governments are currently to deal with the demanding issue regarding climate change, people react to that by adopting more radical perspectives.
 # for the second part, using textual analysis, web scrapping and machine learning, I will see how, in general, people behave towards these ideas and authors
 # I will also be using it to understand how to sync R and GitHub.
+
+
+if (!require("pacman")) install.packages("pacman")
+p_load(ggplot2,tidyverse,gtrendsR, rtweet)
+
 
 #---- Google trend ----
 # First, lets use Google trend to see how, historically, some keywords have behaved. I will define a few words/expressions that will be used during this short experiment:
@@ -12,23 +18,33 @@
 # 4 - Anthropocene;
 # 5 - Degrowth;
 
+# now, let's define major key summits and conferences that will be used during the analysis (since gtrend is mensal, can use only the month of the event):
+# 1 - First major one was Earth Summit / Rio 92 happened during june of 1992 (out of our sample)
+# 2 - Rio +10  aug/2002 (out of our sample)
+# 3 - Rio +20 june/2012
+# 4 - Cop 25 ( 12/2019)
 
-if (!require("pacman")) install.packages("pacman")
-p_load(ggplot2,tidyverse,gtrendsR, rtweet)
+## Let's start!
 
-# setting keywords   Status code was not 200. Returned status code:429
-keywords <- c("Kohei Saito")
-output <- gtrends("Kohei Saito", time="all")
+output <- gtrends(c("Degrowth","Anthropocene","Ecosocialism"), time="all") # if search for more than one keyword receive Error in FUN(X[[i]], ...) : #Status code was not 200. Returned status code:429. have to do it manually then
 
-# now, let's define major key summits and conferences:
-# 1 - First major one was Earth Summit / Rio 92 happened during June 3 to June 14, 1992
-# 2 - Rio +10 from 26 August to 4 September 2002
-# 3 - Rio +20 13 to 22 June 2012
-# 4 - Cop 25 ( 2/12/2019 – 13/12/2019)
+time_trend <-output$interest_over_time
+
+ggplot(data=time_trend,
+            aes(x=date, y=as.numeric(hits), group=keyword, col=keyword)) +
+  geom_line(size = .9, alpha = .75) + labs(
+    title = "Google Search Volume",
+    x = "Time",
+    y = "General Interest",
+    colour = "keyword"
+  )+theme_minimal()
+
+
 
 # there is some kind of trend break? chow test
 
 #---- Twitter ---- https://medium.com/swlh/how-to-train-word2vec-model-using-gensim-library-115b35440c90 https://github.com/bmschmidt/wordVectors
+### first, you have to create a twitter token. this can be done here, using information obtained through the twitter developer platform.
 
 # app
 appname <- "your app name"
