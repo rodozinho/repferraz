@@ -6,7 +6,7 @@
 
 
 if (!require("pacman")) install.packages("pacman")
-p_load(ggplot2,tidyverse,gtrendsR, rtweet)
+p_load(ggplot2,tidyverse,gtrendsR, rtweet,modifiedmk,zoo)
 
 
 #---- Google trend ----
@@ -29,7 +29,7 @@ p_load(ggplot2,tidyverse,gtrendsR, rtweet)
 output <- gtrends(c("Degrowth","Anthropocene","Ecosocialism"), time="all") # if search for more than one keyword receive Error in FUN(X[[i]], ...) : #Status code was not 200. Returned status code:429. have to do it manually then
 
 time_trend <-output$interest_over_time
-
+time_trend <- time_trend %>% select(date,hits,keyword)
 ggplot(data=time_trend,
             aes(x=date, y=as.numeric(hits), group=keyword, col=keyword)) +
   geom_line(size = .9, alpha = .75) + labs(
@@ -39,9 +39,41 @@ ggplot(data=time_trend,
     colour = "keyword"
   )+theme_minimal()
 
+# since there isn't much relevant information for ecosocialism, let's stick with the other two and take the mean for the last month
+time_trend_v2 <- time_trend %>% group_by(keyword) %>% dplyr::mutate(
+  hit_30 = zoo::rollmean(as.numeric(hits), k = 30, fill = NA)) %>% 
+  dplyr::ungroup() %>% filter(keyword!="Ecosocialism")
+
+ggplot(data=time_trend_v2,
+       aes(x=date, y= hit_30 , group=keyword, col=keyword)) +
+  geom_line(size = .9, alpha = .75) + labs(
+    title = "Google Search Volume", # now its smooth
+    x = "Time",
+    y = "General Interest") + theme_minimal() + facet_wrap("keyword")+ theme(legend.position="none")+
+  geom_line(data=time_trend %>%  filter(keyword!="Ecosocialism"),
+            aes(x=date, y=as.numeric(hits), group=keyword, col=keyword)) 
 
 
-# there is some kind of trend break? chow test
+# there is some kind of trend? mann kendall test 
+
+mkttest(as.numeric(unlist(c(as.vector(time_trend_v2 %>% dplyr::filter(keyword=="Anthropocene")%>% select(hits))))))
+# for that, we cannot accept the null hypothesis and is very likely that there is some kind of trend on this data. how about for "Degrowth"?
+
+mkttest(as.numeric(unlist(c(as.vector(time_trend_v2 %>% dplyr::filter(keyword=="Degrowth")%>% select(hits))))))
+# the same! i.e., to both keywords, it is plausible to assume that there is some kind of trend. but could it be any structural break?
+
+ggplot(data=time_trend_v2,
+       aes(x=date, y= hit_30 , group=keyword, col=keyword)) +
+  geom_line(size = .9, alpha = .75) + labs(
+    title = "Google Search Volume", # now its smooth
+    x = "Time",
+    y = "General Interest") + theme_minimal() + facet_wrap("keyword")+ theme(legend.position="none")+
+  geom_line(data=time_trend %>%  filter(keyword!="Ecosocialism"),
+            aes(x=date, y=as.numeric(hits), group=keyword, col=keyword)) + 
+  geom_smooth(aes( color = keyword),method = "lm")
+
+
+# there is some kind of trend break?  chow test
 
 #---- Twitter ---- https://medium.com/swlh/how-to-train-word2vec-model-using-gensim-library-115b35440c90 https://github.com/bmschmidt/wordVectors
 ### first, you have to create a twitter token. this can be done here, using information obtained through the twitter developer platform.
