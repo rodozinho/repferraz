@@ -7,6 +7,8 @@ p_load(ggplot2,tidyverse,fixest,vroom,SciViews,scales,caret, cowplot,data.table,
        modelsummary,openxlsx,vtable,readxl,rdd, jtools,gridExtra)
 
 wd <- "C:/example/" # setting wd
+setwd(dir)
+
 # Defining a function to trim outliers. you can choose the quantile according to your research design
 qrep <- function(x){ 
   quantiles <- quantile(x, c(.01, .99 ),na.rm=T)
@@ -19,7 +21,7 @@ qrep <- function(x){
 rm(list=ls())
 gc()
 
-# importing our main data and setting it. this database contains informations regarding brazilian mayors election. 
+# Importing our main data and preparing it. This database contains informations regarding brazilian mayors election. 
 dado <- vroom("municipality_panel.txt") # https://vroom.r-lib.org/articles/benchmarks.html
 
 dado <- dado %>% filter(year >= 2006) # cleaning the data a little
@@ -33,7 +35,7 @@ dado$muni_expenses <- 0
 
 dado <- dado %>%
   rowwise() %>%
-  mutate(muni_expenses = sum(c_across(ends_with("finbra")), na.rm = F)) # sum of finbra
+  mutate(muni_expenses = sum(c_across(ends_with("finbra")), na.rm = F)) # sum of finbra. taking a lot of time so think how to do it faster! either way, you need to do it once only so it's ok.
 
 
 ln <- dado %>% select(ends_with("finbra")) %>% ln() %>%
