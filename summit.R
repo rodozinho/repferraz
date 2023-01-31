@@ -40,8 +40,8 @@ ggplot(data=time_trend,
   )+theme_minimal()
 
 # since there isn't much relevant information for ecosocialism, let's stick with the other two and take the mean for the last month
-time_trend_v2 <- time_trend %>% group_by(keyword) %>% dplyr::mutate(
-  hit_30 = zoo::rollmean(as.numeric(hits), k = 30, fill = NA)) %>% 
+
+time_trend_v2 <- time_trend %>% group_by(keyword) %>% dplyr::mutate(                                                                hit_30 = zoo::rollmean(as.numeric(hits), k = 30, fill = NA)) %>% 
   dplyr::ungroup() %>% filter(keyword!="Ecosocialism")
 
 ggplot(data=time_trend_v2,
@@ -72,8 +72,11 @@ ggplot(data=time_trend_v2,
             aes(x=date, y=as.numeric(hits), group=keyword, col=keyword)) + 
   geom_smooth(aes( color = keyword),method = "lm")
 
+time_trend_v2$hits <- as.numeric(time_trend_v2$hits)
 
-# there is some kind of trend break?  chow test
+time_trend_v2[which.max(time_trend_v2$hits),] # that way, we know that the highest value for hits is 1000 and it took place during 02/2020. What happened during that month? Covid-19 was declared an outbreak on 30 January 2020. Then, it is plausible to assume that February was a month of intense fear and worries about the future since many started to understand how the disregard for the environmental impact not only the biodiversity but humans as well. Spillover infection.
+
+# there is some kind of trend break? chow test
 
 #---- Twitter ---- https://medium.com/swlh/how-to-train-word2vec-model-using-gensim-library-115b35440c90 https://github.com/bmschmidt/wordVectors
 ### first, you have to create a twitter token. this can be done here, using information obtained through the twitter developer platform.
