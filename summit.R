@@ -1,12 +1,11 @@
 
-# in this file, I will try to see if there is some relationship between environmental conferences/summit and the raise of a marxist view on environmental issues.
+# this file is divides in two. in the first part, I will try to see if there is some relationship between environmental conferences and major environmental disasters and the raise of radical views on environmental issues.
 # my hypothesis is that by seeing how incapable governments are currently to deal with the demanding issue regarding climate change, people react to that by adopting more radical perspectives.
-# for the second part, using textual analysis, web scrapping and machine learning, I will see how, in general, people behave towards these ideas and authors
-# I will also be using it to understand how to sync R and GitHub.
+# for the second part, using textual analysis, web scrapping and machine learning, I will see how, in general, people behave towards left-wing radical writes and scientists.
 
 
 if (!require("pacman")) install.packages("pacman")
-p_load(ggplot2,tidyverse,gtrendsR, rtweet,modifiedmk,zoo)
+p_load(ggplot2,tidyverse,gtrendsR, rtweet,modifiedmk,zoo,strucchange,xts)
 
 
 #---- Google trend ----
@@ -41,8 +40,10 @@ ggplot(data=time_trend,
 
 # since there isn't much relevant information for ecosocialism, let's stick with the other two and take the mean for the last month
 
-time_trend_v2 <- time_trend %>% group_by(keyword) %>% dplyr::mutate(                                                                hit_30 = zoo::rollmean(as.numeric(hits), k = 30, fill = NA)) %>% 
+time_trend_v2 <- time_trend %>% group_by(keyword) %>% dplyr::mutate(hit_30 = zoo::rollmean(as.numeric(hits), k = 30, fill = NA)) %>% 
   dplyr::ungroup() %>% filter(keyword!="Ecosocialism")
+
+time_trend_v2$hits <- as.numeric(time_trend_v2$hits)
 
 ggplot(data=time_trend_v2,
        aes(x=date, y= hit_30 , group=keyword, col=keyword)) +
@@ -51,17 +52,28 @@ ggplot(data=time_trend_v2,
     x = "Time",
     y = "General Interest") + theme_minimal() + facet_wrap("keyword")+ theme(legend.position="none")+
   geom_line(data=time_trend %>%  filter(keyword!="Ecosocialism"),
-            aes(x=date, y=as.numeric(hits), group=keyword, col=keyword)) 
+            aes(x=date, y=hits, group=keyword, col=keyword)) 
 
 
-# there is some kind of trend? mann kendall test 
+# there is some kind of trend? can use the mann kendall test! a non-parametric test which seeks trends in a time series.
 
-mkttest(as.numeric(unlist(c(as.vector(time_trend_v2 %>% dplyr::filter(keyword=="Anthropocene")%>% select(hits))))))
-# for that, we cannot accept the null hypothesis and is very likely that there is some kind of trend on this data. how about for "Degrowth"?
+mkttest(unlist(c(as.vector(time_trend_v2 %>% dplyr::filter(keyword=="Anthropocene")%>% select(hits)))))
 
-mkttest(as.numeric(unlist(c(as.vector(time_trend_v2 %>% dplyr::filter(keyword=="Degrowth")%>% select(hits))))))
-# the same! i.e., to both keywords, it is plausible to assume that there is some kind of trend. but could it be any structural break?
+# for that, we reject the null hypothesis and is very likely that there is some kind of trend on this data. how about for "Degrowth"?
 
+mkttest(unlist(c(as.vector(time_trend_v2 %>% dplyr::filter(keyword=="Degrowth")%>% select(hits)))))
+
+# the same! i.e., to both keywords, it is plausible to assume that there is some kind of trend. but could it be any structural/trend break? inspired by https://stats.stackexchange.com/questions/395078/how-to-detect-and-quantify-a-structural-break-in-time-series-r
+
+a <- (time_trend_v2 %>% filter(keyword=="Anthropocene") %>% select(hits,date))
+a$date <- as.Date(a$date)
+a <- xts(a$hits, a$date)
+a    
+
+test2 <- Fstats(a~1) # getting a sequence of fstats for all possible break points
+test2$Fstats
+
+# now, when did this happened? and why did we start to worry with the consequences of our acts?
 ggplot(data=time_trend_v2,
        aes(x=date, y= hit_30 , group=keyword, col=keyword)) +
   geom_line(size = .9, alpha = .75) + labs(
@@ -72,13 +84,12 @@ ggplot(data=time_trend_v2,
             aes(x=date, y=as.numeric(hits), group=keyword, col=keyword)) + 
   geom_smooth(aes( color = keyword),method = "lm")
 
-time_trend_v2$hits <- as.numeric(time_trend_v2$hits)
 
-time_trend_v2[which.max(time_trend_v2$hits),] # that way, we know that the highest value for hits is 1000 and it took place during 02/2020. What happened during that month? Covid-19 was declared an outbreak on 30 January 2020. Then, it is plausible to assume that February was a month of intense fear and worries about the future since many started to understand how the disregard for the environmental impact not only the biodiversity but humans as well. Spillover infection.
+time_trend_v2[which.max(time_trend_v2$hits),] # that way, we know that the highest value for hits is 1000 and it took place during 02/2020. What happened during that month? Covid-19 was declared an outbreak on 30 January 2020.! Then, it is plausible to assume that February was a month of intense fear and worries about the future since many started to understand how our disregard for the environment impact not only biodiversity but humans as well. As we economists know, spillovers happen all the time and the same is valid for infections/diseases.
 
-# there is some kind of trend break? chow test
 
 #---- Twitter ---- https://medium.com/swlh/how-to-train-word2vec-model-using-gensim-library-115b35440c90 https://github.com/bmschmidt/wordVectors
+# Initially my idea was to see how # the problem is that the free dev version only allows for a search through the last 7 days.
 ### first, you have to create a twitter token. this can be done here, using information obtained through the twitter developer platform.
 
 # app
@@ -104,7 +115,7 @@ twitter_token <- create_token(
   access_token = access_token,
   access_secret = access_secret)
 
-dfecos <- search_tweets("Eco-socialism OR ecosocialism", token = auth,n = Inf) # the problem is that the free dev version only allows for a search through the last 7 days.
+dfecos <- search_tweets("Eco-socialism OR ecosocialism", token = auth,n = Inf) 
 
 dfmarx  <- search_tweets("Marxism OR marxist OR marxism", token = auth,n = Inf) 
 
