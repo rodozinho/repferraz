@@ -6,7 +6,8 @@
 
 if (!require("pacman")) install.packages("pacman")
 p_load(ggplot2,tidyverse,gtrendsR, rtweet,modifiedmk,zoo,strucchange,xts)
-
+rm(list=ls())
+gc()
 
 #---- Google trend ----
 # First, lets use Google trend to see how, historically, some keywords have behaved. I will define a few words/expressions that will be used during this short experiment:
@@ -63,17 +64,36 @@ mkttest(unlist(c(as.vector(time_trend_v2 %>% dplyr::filter(keyword=="Anthropocen
 
 mkttest(unlist(c(as.vector(time_trend_v2 %>% dplyr::filter(keyword=="Degrowth")%>% select(hits)))))
 
-# the same! i.e., to both keywords, it is plausible to assume that there is some kind of trend. but could it be any structural/trend break? inspired by https://stats.stackexchange.com/questions/395078/how-to-detect-and-quantify-a-structural-break-in-time-series-r
+# the same! i.e., to both keywords, it is plausible to assume that there is some kind of trend. but could it be any structural/trend break? inspired by https://stats.stackexchange.com/questions/395078/how-to-detect-and-quantify-a-structural-break-in-time-series-r, lets analyze the trend regarding "Anthropocene" search.
 
-a <- (time_trend_v2 %>% filter(keyword=="Anthropocene") %>% select(hits,date))
-a$date <- as.Date(a$date)
+a <- (time_trend_v2 %>% filter(keyword=="Anthropocene") %>% select(hits,date)) 
+a$date <- as.Date(a$date) # turning it into a time series
 a <- xts(a$hits, a$date)
-a    
 
-test2 <- Fstats(a~1) # getting a sequence of fstats for all possible break points
-test2$Fstats
+a
 
-# now, when did this happened? and why did we start to worry with the consequences of our acts?
+autoplot.zoo(a) # to visualize a time series
+             
+test2 <- Fstats(a~1,from=0.05) # getting a sequence of fstats for all possible break points. in this case, we define to take observations from 0.05 to 0.95. as our sample has 458 observations, it goes from 23 to 435.
+
+breakp <- breakpoints(test2$Fstats~1) # now trying to get the breakpoints
+breakp # We get that: Breakpoints at observation number 43 74 105 142 173 
+
+plot(test2) #plots the series
+lines(breakp) #plots the break date implied by the sup F test
+
+breakpdates <- breakdates(breakp) # getting the breakpoint dates
+breakpdates <- breakpdates*365 # setting it to day number i.e. on the 84th day on our time series there is a break
+
+sctest(test2) #Obtains a p-value for the implied breakpoint
+
+ci <- confint(breakp) #95% CI for the location break date
+plot(test2)
+lines(ci) #This shows the interval around the estimated break date
+
+rm(list=setdiff(ls(), "time_trend_v2")) # cleaning the environment
+
+# now, we where mostly worried with anthropocene? and why did we start to worry with the consequences of our acts?
 ggplot(data=time_trend_v2,
        aes(x=date, y= hit_30 , group=keyword, col=keyword)) +
   geom_line(size = .9, alpha = .75) + labs(
