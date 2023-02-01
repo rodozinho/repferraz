@@ -93,16 +93,30 @@ lines(ci) #This shows the interval around the estimated break date
 
 rm(list=setdiff(ls(), "time_trend_v2")) # cleaning the environment
 
-# now, we where mostly worried with anthropocene? and why did we start to worry with the consequences of our acts?
-ggplot(data=time_trend_v2,
-       aes(x=date, y= hit_30 , group=keyword, col=keyword)) +
+### this time series is kind of right-skewed. it is plausible to assume that people started to Google more something the more people had internet access. to bypass that, it would be good to log-linearize.
+a <- (time_trend_v2 %>% filter(keyword=="Anthropocene") %>% select(hits,date)) %>% mutate(hits = log(hits))
+a <-  a %>% mutate_if(is.numeric, function(x) ifelse(is.infinite(x), 0, x))# replacing inf from the ln to zero. it isn't wrong since they were 0 by default
+
+a$date <- as.Date(a$date) # turning it into a time series
+a <- xts(a$hits, a$date)
+
+plot(a)
+
+# now we can do the same as before looking for breakpoints! feel free to do it.
+rm(a)
+
+### keeping up, now I want to answer: when where we mostly worried with anthropocene? and why did we start to worry with the consequences of our acts?
+
+ggplot(data=time_trend_v2 %>%  filter(keyword=="Anthropocene"),
+       aes(x=date, y= hit_30 , group=keyword), col="deeppink") +
   geom_line(size = .9, alpha = .75) + labs(
     title = "Google Search Volume", # now its smooth
     x = "Time",
     y = "General Interest") + theme_minimal() + facet_wrap("keyword")+ theme(legend.position="none")+
-  geom_line(data=time_trend %>%  filter(keyword!="Ecosocialism"),
-            aes(x=date, y=as.numeric(hits), group=keyword, col=keyword)) + 
-  geom_smooth(aes( color = keyword),method = "lm")
+  geom_line(data=time_trend_v2 %>%  filter(keyword=="Anthropocene"),
+            aes(x=date, y=as.numeric(hits), group=keyword), col="deeppink4") + 
+  geom_smooth(aes( color = keyword),method = "gam")
+
 
 
 time_trend_v2[which.max(time_trend_v2$hits),] # that way, we know that the highest value for hits is 1000 and it took place during 02/2020. What happened during that month? Covid-19 was declared an outbreak on 30 January 2020.! Then, it is plausible to assume that February was a month of intense fear and worries about the future since many started to understand how our disregard for the environment impact not only biodiversity but humans as well. As we economists know, spillovers happen all the time and the same is valid for infections/diseases.
