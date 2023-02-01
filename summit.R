@@ -123,6 +123,8 @@ time_trend_v2[which.max(time_trend_v2$hits),] # that way, we know that the highe
 
 
 #---- Twitter ---- https://medium.com/swlh/how-to-train-word2vec-model-using-gensim-library-115b35440c90 https://github.com/bmschmidt/wordVectors
+
+
 # Initially my idea was to see how the narrative changes after environmental conferences # the problem is, however, that the free twitter dev version only allows for a search through the last 7 days. due to that, I decided to explore a little of textual analysis and see how people perceive left ideas nowadays.
 
 ### first, you have to create a twitter token. this can be done here, using information obtained through the twitter developer platform.
@@ -166,3 +168,6 @@ dflowy <- search_tweets("Michael Löwy OR Löwy ",
 
 dfsaito <- search_tweets("kohei saito",
                            token = auth,n = Inf)
+
+## now that we have our data, let's explore them! initially, you must download wordVectors
+devtools::install_github("bmschmidt/wordVectors") # if having any issue regarding permission for any package, can remove.packages("package") and reinstall it
