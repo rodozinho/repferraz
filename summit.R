@@ -123,7 +123,8 @@ time_trend_v2[which.max(time_trend_v2$hits),] # that way, we know that the highe
 
 
 #---- Twitter ---- https://medium.com/swlh/how-to-train-word2vec-model-using-gensim-library-115b35440c90 https://github.com/bmschmidt/wordVectors
-# Initially my idea was to see how # the problem is that the free dev version only allows for a search through the last 7 days.
+# Initially my idea was to see how the narrative changes after environmental conferences # the problem is, however, that the free twitter dev version only allows for a search through the last 7 days. due to that, I decided to explore a little of textual analysis and see how people perceive left ideas nowadays.
+
 ### first, you have to create a twitter token. this can be done here, using information obtained through the twitter developer platform.
 
 # app
