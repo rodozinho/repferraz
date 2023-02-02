@@ -326,16 +326,24 @@ base_map <- aggregate(base$incremento, by = list(base$ano), FUN=sum) # summing t
 base_map <- base_map %>% dplyr::rename(year=Group.1,def_increase=x)
 
 ggplot(data=base_map,aes(x=year,y=def_increase))+geom_line()+ xlab("Years") +
- ylab("Deforestation Increase")+theme_minimal() +legend("asdasd")
+ ylab("Deforestation Increase")+theme_minimal() 
 
-### how to create a map? For me, the best way is to get coordinates at https://www.openstreetmap.org/export#map=14/-22.9645/-43.193 and apply them below. This method is my favorite since it's pretty straightforward, easy to visualizate the boundaries wished (just limit it as you wish at openstreetmap) and it has many maptypes. Either way, below I will also exlopre other ways.
+## hmm maybe some new maps because why not? let's see how this accumulated deforestation is geographically distributed
+base_map <- aggregate(base$incremento, by = list(base$code_muni), FUN=sum) 
+base_map <- base_map %>% dplyr::rename(muni_code=Group.1,def_increase=x)
+
+lat_lon <- vroom("latitude.txt") # for all brazilian city, let's get latitude and longitude
+base_map <- left_join(base_map,lat_lon,by=c("muni_code"="codigo_ibge"))
+base_map <- base_map %>% dplyr::select(muni_code,latitude,longitude,def_increase) 
+
+## another way to create maps (the best, in my opinion) is to get coordinates at https://www.openstreetmap.org/export#map=14/-22.9645/-43.193 and apply them below. This method is my favorite since it's pretty straightforward, easy to see the boundaries wished (just limit it as you wish at openstreetmap) and it has many maptypes. Either way, below I will also explore other ways.
 
 am_map <- get_stamenmap( #getting Brazilian's Amazon Rainforest coords 
   bbox = c(left = -75.190,bottom = -22.187,right=-29.092,top = 8.146),
-  maptype = "terrain",zoom=6
+  maptype = "watercolor",zoom=6
 )
 
-ggmap(am_map)+geom_point(data= base,aes(x = lon,y=lat,color=indicator))+scale_color_viridis_c(option = "magma")+
+ggmap(am_map)+geom_point(data= base_map,aes(x = longitude,y=latitude,color=def_increase))+scale_color_viridis_c(option = "magma")+
   theme_map()+labs(title="Figure 2") 
 
 ### Now what about blacklisting and accumulated deforestation? What is the historical pattern of deforestation?

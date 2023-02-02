@@ -10,7 +10,7 @@ The first file "campaign_cap.R" tries to replicate the paper "Money and Politics
 
 The second file "amazon.R" contains an analysis of deforestation of the Brazilian Amazon rainforest, part of my master's dissertation. Here, I will try to give an overall perspective on how deforestation behaves on The Amazon rainforest and give some explanations for these patterns. The source of the deforestation increase is PRODES, a Brazilian federal sub-organization that produces information regarding deforestation inside the so-called "Legal Amazon" i.e. municipalities that have Amazon rainforest inside them.
 
-Since 2006, that's how deforestation has behaved in the region:
+With a simple graph, let's see how deforestation has behaved in the region, since 2006:
 
 ![def](https://user-images.githubusercontent.com/51092062/216448491-071e5621-d084-47ef-8618-97fc915fbf31.png)
 
