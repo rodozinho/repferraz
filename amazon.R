@@ -322,6 +322,11 @@ coord_sf(xlim = c(-25,50), ylim = c(35,70), expand = FALSE)
 
 # As visible, a few countries "carry" this burden, such as Spain, Netherlands, France, and Russia. Quantifying how this global chain of primary products affects deforestation directly is, however, out of the boundaries of the present exploration. Still, we can suppose (and the literature corroborates that) that, at least to some degree, the food on the plate of a Spanish comes with CO2 and biodiversity loss.      
 
+base_map <- aggregate(base$incremento, by = list(base$ano), FUN=sum) # summing to find overall deforestation increase
+base_map <- base_map %>% dplyr::rename(year=Group.1,def_increase=x)
+
+ggplot(data=base_map,aes(x=year,y=def_increase))+geom_line()+ xlab("Years") +
+ ylab("Deforestation Increase")+theme_minimal() +legend("asdasd")
 
 ### how to create a map? For me, the best way is to get coordinates at https://www.openstreetmap.org/export#map=14/-22.9645/-43.193 and apply them below. This method is my favorite since it's pretty straightforward, easy to visualizate the boundaries wished (just limit it as you wish at openstreetmap) and it has many maptypes. Either way, below I will also exlopre other ways.
 
