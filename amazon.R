@@ -336,7 +336,7 @@ lat_lon <- vroom("latitude.txt") # for all brazilian city, let's get latitude an
 base_map <- left_join(base_map,lat_lon,by=c("muni_code"="codigo_ibge"))
 base_map <- base_map %>% dplyr::select(muni_code,latitude,longitude,def_increase) 
 
-## another way to create maps (the best, in my opinion) is to get coordinates at https://www.openstreetmap.org/export#map=14/-22.9645/-43.193 and apply them below. This method is my favorite since it's pretty straightforward, easy to see the boundaries wished (just limit it as you wish at openstreetmap) and it has many maptypes. Either way, below I will also explore other ways.
+## another way to create maps (the easiest, in my opinion) is to get coordinates at https://www.openstreetmap.org/export#map=14/-22.9645/-43.193 and apply them below. This method  it's pretty straightforward, easy to see the boundaries wished (just limit it as you wish at openstreetmap) and it has many maptypes. However, for this kind of data, this doesn't work well, since we need "geom" to create municipalities. For that, I will also explore other ways.
 
 am_map <- get_stamenmap( #getting Brazilian's Amazon Rainforest coords 
   bbox = c(left = -75.190,bottom = -22.187,right=-29.092,top = 8.146),
@@ -346,4 +346,27 @@ am_map <- get_stamenmap( #getting Brazilian's Amazon Rainforest coords
 ggmap(am_map)+geom_point(data= base_map,aes(x = longitude,y=latitude,color=def_increase))+scale_color_viridis_c(option = "magma")+
   theme_map()+labs(title="Figure 2") 
 
-### Now what about blacklisting and accumulated deforestation? What is the historical pattern of deforestation?
+
+### Let's try another way!
+rm(am_map) # cleaning the environment
+
+# for Brazil, there is a package called geobr that deals with that easily
+read_municipality() -> all_mun # getting all municipalities inside brazil and their geom
+all_mun <- all_mun %>% dplyr::select(code_muni,geom) # what we trully want
+base <- left_join(base, all_mun, by = c("code_muni"))
+rm(all_mun)
+
+base <-base %>%  dplyr::rename(geometry=geom)
+
+# aggrega
+
+ggplot() +
+  geom_sf(data=base %>% filter(ano==2016), aes(geometry = geometry,fill=incremento), size=.15)+
+  labs(title="Deforestation per year")+
+  scale_fill_distiller(palette = "Greens", limits=c(0.5, 0.8),
+                       name="Code_muni")+  theme_minimal()
+
+ggplot(base) + 
+  geom_sf(aes(geometry = geometry,fill =incremento)) +labs(fill='Import of Brazilian primary products \nwhich usually are associated with deforestation (R$)') +
+  scale_fill_viridis_c(option = "plasma",label=scales::comma) + theme_bw()+ facet_wrap(~ano)+
+  coord_sf(xlim = c(-25,50), ylim = c(35,70), expand = FALSE)
