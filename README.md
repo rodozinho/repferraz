@@ -10,7 +10,7 @@ The first file "campaign_cap.R" tries to replicate the paper "Money and Politics
 
 The second file "amazon.R" contains an analysis of deforestation of the Brazilian Amazon Rainforest, part of my master's dissertation. Here, I will try to give an overall perspective on how deforestation behaves on The Amazon Rainforest and give some explanations for these patterns.
 
-![plot](C:/Users/skyro/Desktop/primary.png)
+![primary](https://user-images.githubusercontent.com/51092062/216446120-b742edea-fb8e-4f0d-ac59-94993944693f.png)
 # summit.R
 
 The last file "summit.R" tries to see if there is some relationship between environmental conferences/summits and the raise of radical leftist perspectives regarding environmental issues.
