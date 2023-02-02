@@ -10,11 +10,15 @@ p_load(ggplot2,deflateBR, readxl, tidyverse, lubridate, sf, zoo, data.table, fac
 rm(list=ls())
 gc()
 
+setwd("C:/Users/skyro/OneDrive - unb.br/tese/dados") # set your wd
+
 # Importing datasets and cleaning them
 desmatamento_municipio <- read_excel("desmatamento_municipio.xltx",  # this xltx contains information about deforestation for every municipality in the amazon rainforest
                                      col_types = c("numeric", "numeric", "numeric", 
                                                    "numeric", "text", "numeric", "text", 
                                                    "numeric", "numeric", "numeric"))
+
+
                                                    
 desmatamento_municipio <- desmatamento_municipio %>% filter(ano >= 2006) # deforestation only from 2006
 desmatamento_municipio <- desmatamento_municipio %>% dplyr::rename(code_muni = id_municipio) #fixing the municipality code name
@@ -169,14 +173,164 @@ base <- left_join(base,teste,  by = c("code_muni","ano")) #jogando na base
 rm(list=setdiff(ls(), c("base"))) # cleaning the environment
 
 ### Now we will append information regarding export to Europe. The initial idea of the work was to understand the relationship between deforestation and exportation of primary products to developed countries, but I gave up on that. Either way, I will explore that below, plot a few graphs and create some maps.
+exportfiltered <- vroom("exportfiltered.csv")
+
+# selecting only products used to create our cattle and agriculture indexes
+
+exportfiltered <- exportfiltered %>% filter((SH4 == 201 |SH4 == 202|SH4 == 1201|SH4 == 1507|SH4 == 2304 # cattle + soy 
+                                             |SH4 == 1108|SH4 == 1005|SH4 == 1102|SH4 == 1103 # corn
+                                             |SH4 == 1701|SH4 == 1702|SH4 == 1703|SH4 == 2207 # sugar cane
+                                             |SH4 == 1006 # rice
+                                             |SH4 == 1108)) # cassava
+
+pais_bloco <- vroom("PAIS_BLOCO.csv")
+pais_bloco <- pais_bloco %>% dplyr::select(-NO_BLOCO)
+
+pais_bloco <- left_join(exportfiltered,pais_bloco, by = "CO_PAIS") 
+rm(exportfiltered)
+
+pais_bloco <- pais_bloco %>% filter(CO_BLOCO == 112) # only europe
+
+pais_bloco <- pais_bloco %>% group_by(CO_ANO,CO_MUN) %>% dplyr::summarise(exp_total = sum(VL_FOB)) # for each year and for each municipality, wanted to see how much they exported to Europe
+
+
+cambio <- read_excel("cambio.xlsx") # exchange rate
+pais_bloco <- left_join(pais_bloco, cambio, by = c("CO_ANO"="ano")) 
+
+pais_bloco$exp_cambio <- pais_bloco$exp_total*pais_bloco$cambio
+
+pais_bloco$data <- as.Date(paste(pais_bloco$CO_ANO, 12, 31, sep = "-"))  # now I'll try to deflate these values
+pais_bloco$exp_defl <- deflate(pais_bloco$exp_cambio,pais_bloco$data, real_date = "01/2020") 
+pais_bloco <- pais_bloco %>% dplyr::select(CO_ANO,CO_MUN,exp_cambio,exp_defl)
+
+base <- left_join(base,pais_bloco,by = c("ano"="CO_ANO","code_muni"="CO_MUN")) # appending it to the databse
+
+rm(list=setdiff(ls(), c("base"))) # cleaning the environment
+
+### Is there some association between deforestation and export? Let's use the data only from municipalities of info about export
+base_map <- base %>% drop_na(exp_defl) 
+
+# the most logical thing is to assume some kind of lag. if the deforestation happens now, only on the following years this will impact export. 
+
+
+### now that we have settled our base, let's go to the developed world and study the export (import, from the European country perspective) of primary products
+
+exportfiltered <- exportfiltered %>% filter((SH4 == 201 |SH4 == 202|SH4 == 1201|SH4 == 1507|SH4 == 2304 # cattle + soy 
+                                             |SH4 == 1108|SH4 == 1005|SH4 == 1102|SH4 == 1103 # corn
+                                             |SH4 == 1701|SH4 == 1702|SH4 == 1703|SH4 == 2207 # sugar cane
+                                             |SH4 == 1006 # rice
+                                             |SH4 == 1108)) # cassava
+
+pais_bloco <- vroom("PAIS_BLOCO.csv")
+pais_bloco <- pais_bloco %>% dplyr::select(-NO_BLOCO)
+
+pais_bloco <- left_join(exportfiltered,pais_bloco, by = "CO_PAIS") 
+rm(exportfiltered)
+
+pais_bloco <- pais_bloco %>% filter(CO_BLOCO == 112) # only europe
+
+
+pais_bloco <- aggregate(pais_bloco$VL_FOB, by = list(pais_bloco$CO_ANO,pais_bloco$CO_MES, pais_bloco$CO_PAIS), FUN=sum) # sum of all export to each country for a given year
+
+pais_bloco <- pais_bloco %>% dplyr::rename(CO_ANO = Group.1 , CO_MES = Group.2,  CO_PAIS = Group.3, VL_FOB = x) # renaming because its messy
+
+pais_bloco <- aggregate(pais_bloco$VL_FOB, by = list(pais_bloco$CO_ANO, pais_bloco$CO_PAIS), FUN=sum) # now I'll sum for all months in a year, for each country
+
+pais_bloco <- pais_bloco %>% dplyr::rename(CO_ANO = Group.1 , 
+                                                  CO_PAIS = Group.2,  VL_FOB = x) # renaming again
+
+cambio <- read_excel("cambio.xlsx")# exchange rate again
+
+pais_bloco <- left_join(pais_bloco, cambio, by = c("CO_ANO"="ano")) 
+rm(cambio)
+
+pais_bloco$expreal <- pais_bloco$VL_FOB*pais_bloco$cambio # export in terms of real, for each country, for every year
+
+pais_bloco$data <- as.Date(paste(pais_bloco$ano, 12, 31, sep = "-"))  # date to deflate (it rhymes)
+pais_bloco$exp_defl <- deflate(pais_bloco$expreal,pais_bloco$data, real_date = "01/2020") # deflating
+
+pais_bloco$teste <- dplyr::recode(pais_bloco$CO_PAIS,'17' = "Albania", # renaming it
+                                                             '23' = "Germany",
+                                                             "37" = "Andorra",
+                                                             '72' = "Austria",
+                                                             '85' = "Belarus", 
+                                                             "87" = "Belgium",
+                                                             '98' = "Bosnia and Herzegovina",
+                                                             '111' = "Bulgaria", 
+                                                             '151' = "Moldava",
+                                                             '163' = "Chipre",
+                                                             '195' = "Croatia",
+                                                             '232' = "Denmark",
+                                                             '245' = "Spain",
+                                                             '246' = "Slovenia",
+                                                             '247' = "Slovakia",
+                                                             '251' = "Estonia",
+                                                             '259' = "Faroe",
+                                                             '271' = "Finland",
+                                                             '275' = "France",
+                                                             '293' = "Gibraltar",
+                                                             '301' = "Greece",
+                                                             "305" = "Greenland",
+                                                             "321" = "Guernsey",
+                                                             '355' = "Hungary",
+                                                             '359' = "Isle of Man",
+                                                             '375' = "Ireland",
+                                                             '379' = "Iceland",
+                                                             '386' = "Italy",
+                                                             '393' = "Jersey",
+                                                             '427' = "Latvia",
+                                                             '440' = "Liechtenstein",
+                                                             '442' = "Lithuania",
+                                                             '445' = "Luxembourg",
+                                                             '449' = "Macedonia",
+                                                             '467' = "Malta",
+                                                             '494' = "Moldova",
+                                                             '495' = "Monaco",
+                                                             '498' = "Montenegro",
+                                                             '538' = "Norway",
+                                                             '573' = "Netherlands",
+                                                             '603' = "Poland",
+                                                             '607' = "Portugal",
+                                                             '628' = "United Kingdom",
+                                                             '670' = "Romania",
+                                                             '676' = "Russia",
+                                                             '697' = "San Marino",
+                                                             '737' = "Republic of Serbia",
+                                                             '764' = "Sweden",
+                                                             "767" = "Switzerland",
+                                                             '791' = "Czech Republic",
+                                                             '827' = "Turkey",
+                                                             '831' = "Ukraine",
+                                                             "848" = "Vatican")
+pais_bloco <- pais_bloco %>% drop_na(teste)  %>% complete(nesting(teste),ano = full_seq(ano, period = 1))# dropping na and balacing the data
+
+# Now let's create some maps!
+
+world <- ne_countries(scale = "medium", returnclass = "sf")
+Europe <- world[which(world$region_un == "Europe"),]
+teste <- Europe %>% dplyr::select(geometry,geounit)
+teste <- teste %>% dplyr::rename(teste =geounit)
+teste <- left_join(teste,pais_bloco,by="teste")
+teste <- subset(teste,ano!=2022)  # for all years except 2022 that I don't have all info
+teste$exp_defl[is.na(teste$exp_defl)] <- 0 # since this database is very complete, we can suppose that NA equals to zero or around zero
+
+                              
+ggplot(teste) + 
+ geom_sf(aes(geometry = geometry,fill =exp_defl)) +labs(fill='Import of Brazilian primary products \nwhich usually are associated with deforestation (R$)') +
+scale_fill_viridis_c(option = "plasma",label=scales::comma) + theme_bw()+ facet_wrap(~ano)+
+coord_sf(xlim = c(-25,50), ylim = c(35,70), expand = FALSE)
+
+# As visible, a few countries "carry" this burden, such as Spain, Netherlands, France, and Russia. Quantifying how this global chain of primary products affects deforestation directly is, however, out of the boundaries of the present exploration. Still, we can suppose (and the literature corroborates that) that, at least to some degree, the food on the plate of a Spanish comes with CO2 and biodiversity loss.      
+
 
 ### how to create a map? For me, the best way is to get coordinates at https://www.openstreetmap.org/export#map=14/-22.9645/-43.193 and apply them below. This method is my favorite since it's pretty straightforward, easy to visualizate the boundaries wished (just limit it as you wish at openstreetmap) and it has many maptypes. Either way, below I will also exlopre other ways.
 
-nig_map <- get_stamenmap( #getting Nigeria's map coord 
-  bbox = c(left = -2.8,bottom = 1.31,right=20.2,top = 16.5),
+am_map <- get_stamenmap( #getting Brazilian's Amazon Rainforest coords 
+  bbox = c(left = -75.190,bottom = -22.187,right=-29.092,top = 8.146),
   maptype = "terrain",zoom=6
 )
-ggmap(nig_map)+geom_point(data= subs,aes(x = lon,y=lat,color=indicator))+scale_color_viridis_c(option = "magma")+
+
+ggmap(am_map)+geom_point(data= base,aes(x = lon,y=lat,color=indicator))+scale_color_viridis_c(option = "magma")+
   theme_map()+labs(title="Figure 2") 
 
 ### Now what about blacklisting and accumulated deforestation? What is the historical pattern of deforestation?
