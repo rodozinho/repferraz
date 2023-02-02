@@ -122,52 +122,31 @@ ggplot(data=time_trend_v2 %>%  filter(keyword=="Anthropocene"),
 time_trend_v2[which.max(time_trend_v2$hits),] # that way, we know that the highest value for hits is 1000 and it took place during 02/2020. What happened during that month? Covid-19 was declared an outbreak on 30 January 2020.! Then, it is plausible to assume that February was a month of intense fear and worries about the future since many started to understand how our disregard for the environment impact not only biodiversity but humans as well. As we economists know, spillovers happen all the time and the same is valid for infections/diseases.
 
 
-#---- Twitter ---- https://medium.com/swlh/how-to-train-word2vec-model-using-gensim-library-115b35440c90 https://github.com/bmschmidt/wordVectors
+#---- Twitter ---- inspired by https://medium.com/swlh/how-to-train-word2vec-model-using-gensim-library-115b35440c90 and using https://github.com/bmschmidt/wordVectors
 
 
-# Initially my idea was to see how the narrative changes after environmental conferences # the problem is, however, that the free twitter dev version only allows for a search through the last 7 days. due to that, I decided to explore a little of textual analysis and see how people perceive left ideas nowadays.
+# Initially my idea was to see how the narrative changes after environmental conferences # the problem is, however, that the free twitter dev version only allows for a search through the last 7 days. due to that, I decided to explore a little of textual analysis and see how people perceive leftist ideas nowadays.
 
-### first, you have to create a twitter token. this can be done here, using information obtained through the twitter developer platform.
+### first, you have to create a twitter token. this can be done here, using information obtained through the twitter developer platform. it's important to notice that these information are private and shouldn't be shared! You will need:
 
-# app
-appname <- "your app name"
+## api key; api secret; access_token & access_secret
 
-## api key
-secret <- "your api key"
+auth <- rtweet_bot() 
 
-## api secret 
-secret <- "your api secret "
+### after that, it is easy to search what you want. 
 
-## access_token
-access_token <- "your access_token"
+dfmarx  <- search_tweets("Marxism OR marxist OR marxism", token = auth,n = Inf,include_rts = F) 
 
-## access_secret
+# we are only interested in a few columns
+dfmarx <- dfmarx %>% select(id,full_text,favorite_count,retweet_count)
 
-access_secret <- "your access_secret"
 
-twitter_token <- create_token(
-  app = appname,
-  consumer_key = key,
-  consumer_secret = secret,
-  access_token = access_token,
-  access_secret = access_secret)
+## now that we have our data, let's clean and explore them!  
+# lets remove links and punctuation. also, no stop words and numbers
+dfmarx$full_text <- gsub(" ?(f|ht)tp(s?)://(.*)[.][a-z]+", "", dfmarx$full_text) # removing links
 
-dfecos <- search_tweets("Eco-socialism OR ecosocialism", token = auth,n = Inf) 
 
-dfmarx  <- search_tweets("Marxism OR marxist OR marxism", token = auth,n = Inf) 
 
-dfantro  <- search_tweets("Anthropocene", token = auth,n = Inf) 
-
-dfdeg  <- search_tweets("Degrowth", token = auth,n = Inf) 
-
-dffoster <- search_tweets("John Bellamy Foster OR JB Foster",
-                           token = auth,n = Inf)
-
-dflowy <- search_tweets("Michael Löwy OR Löwy ",
-                           token = auth,n = Inf)
-
-dfsaito <- search_tweets("kohei saito",
-                           token = auth,n = Inf)
-
-## now that we have our data, let's explore them! initially, you must download wordVectors
+# the next step is to analyze it. initially, you must download wordVectors
 devtools::install_github("bmschmidt/wordVectors") # if having any issue regarding permission for any package, can remove.packages("package") and reinstall it
+
