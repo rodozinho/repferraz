@@ -14,7 +14,11 @@ With a simple graph, let's see how deforestation has behaved in the region, sinc
 
 ![def](https://user-images.githubusercontent.com/51092062/216448491-071e5621-d084-47ef-8618-97fc915fbf31.png)
 
-Now looking at maps, it is easy to see the (in)famous Brazilian agricultural frontier. 
+Now looking at how this deforestation has behaved geographically since 2006:
+![def_increase_mun](https://user-images.githubusercontent.com/51092062/216614481-030c1ccd-d2f0-4552-b77a-7e0a3ebaeac2.png)
+
+It is easy to  see the (in)famous *Brazilian agricultural frontier*:
+
 
 ![primary](https://user-images.githubusercontent.com/51092062/216446120-b742edea-fb8e-4f0d-ac59-94993944693f.png)
 # summit.R

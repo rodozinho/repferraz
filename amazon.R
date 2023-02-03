@@ -365,16 +365,15 @@ base_agg <- aggregate(incremento ~ code_muni, data=base, FUN=sum)
 base_agg <- left_join(base_agg,base %>% dplyr::select(code_muni,geometry),by="code_muni")
 base_agg<- base_agg[!duplicated(base_agg), ]
 
-# ggplot(testecodigo)+ 
- # geom_sf(aes(geometry = geom, fill = incremento)) +
-# #   scale_fill_viridis_c(option = "plasma") + theme_bw() + labs(fill='Deforestation') 
-
-   ggplot(base_agg) +
+ggplot(base_agg) +
   geom_sf(aes(geometry = geometry,fill=as.numeric(incremento)))+
-  labs(title="Deforestation per year")+
-  scale_fill_distiller(palette = "Greens", limits=c(0.5, 0.8),
-                       name="Code_muni")+  theme_minimal()
-
+     scale_fill_viridis_c(option = "inferno") + theme_bw() + labs(fill='Deforestation increase \nsince 2006') 
+   
+# lets build an arch!
+ggplot(base_agg) +
+     geom_sf(aes(geometry = geometry,fill=as.numeric(incremento)))+
+     scale_fill_viridis_c(option = "inferno") + theme_bw() + labs(fill='Deforestation increase \nsince 2006')  
+   
 ggplot(base) + 
   geom_sf(aes(geometry = geometry,fill =incremento)) +labs(fill='Import of Brazilian primary products \nwhich usually are associated with deforestation (R$)') +
   scale_fill_viridis_c(option = "plasma",label=scales::comma) + theme_bw()+ facet_wrap(~ano)+
