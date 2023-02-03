@@ -38,6 +38,8 @@ Now looking at how this deforestation has behaved geographically since 2006: ![d
 
 It is easy to see the (in)famous *Brazilian agricultural frontier*: ![def_increase_mun_arch](https://user-images.githubusercontent.com/51092062/216621837-3c51c06e-1231-4acb-ab3f-9fc00f8443c9.png)
 
+You don't have to trust my word! Let's see where there is new soy plantations. Let's stick with municipalities that have a trend of increase of areas for soy. What I'm going to do is see for all municipalities if their trends are increasing or decreasing. As done on the .R, if decreasing, I dropped the municipality. Below I plot the list of municipalities with soy production rising.
+
 Now let's go to the "developed world" and study the export (import, from an European country perspective) of Brazilian primary products: ![primary](https://user-images.githubusercontent.com/51092062/216446120-b742edea-fb8e-4f0d-ac59-94993944693f.png)
 
 As visible, a few countries "carry" this burden, such as Spain, Netherlands, France, and Russia. Quantifying how this global chain of primary products affects deforestation directly is, however, out of the boundaries of the present exploration. Still, we can suppose (and the literature corroborates that) that, at least to some degree, the food on the plate of a Spanish comes with CO2 and biodiversity loss.

@@ -387,6 +387,7 @@ ggplot(base_agg) +
      geom_sf(aes(geometry = geometry,fill=as.numeric(incremento)))+
      scale_fill_viridis_c(option = "inferno") + theme_bw() + labs(fill='Deforestation increase \nsince 2006')  +
   geom_curve(aes(x =orig_lon, y = orig_lat, xend = dest_lon, yend = dest_lat), data = arch, colour = "red",size=2)+ coord_sf()
+
 rm(arch,base_agg,lat_lon)
 
 # You don't have to trust my word! Let's see where there is new soy plantations 
@@ -409,5 +410,6 @@ municipio_lavouras$increased_soy <- 1
 left_join(base,municipio_lavouras,by="code_muni") -> base
 
 ggplot(base) +
-  geom_sf(aes(geometry = geometry,fill=as.numeric(incremento)))+
-  scale_fill_viridis_c(option = "inferno") + theme_bw() + labs(fill='Soy')+scale_fill_discrete(fill=increased_soy)
+  geom_sf(aes(geometry = geometry,fill=increased_soy))+  theme_bw() + labs(fill='Soy')+
+  geom_curve(aes(x =orig_lon, y = orig_lat, xend = dest_lon, yend = dest_lat), data = arch, colour = "red",linewidth=2)+ coord_sf()
+# arrows?
