@@ -350,18 +350,27 @@ ggmap(am_map)+geom_point(data= base_map,aes(x = longitude,y=latitude,color=def_i
 ### Let's try another way!
 rm(am_map) # cleaning the environment
 
-# for Brazil, there is a package called geobr that deals with that easily
+# for Brazil, there is a package called "geobr" that deals with that easily
 read_municipality() -> all_mun # getting all municipalities inside brazil and their geom
 all_mun <- all_mun %>% dplyr::select(code_muni,geom) # what we trully want
 base <- left_join(base, all_mun, by = c("code_muni"))
-rm(all_mun)
+rm(all_mun,lat_lon)
 
 base <-base %>%  dplyr::rename(geometry=geom)
 
-# aggrega
+# let's aggregate the deforestation
 
-ggplot() +
-  geom_sf(data=base %>% filter(ano==2016), aes(geometry = geometry,fill=incremento), size=.15)+
+base_agg <- aggregate(incremento ~ code_muni, data=base, FUN=sum)
+
+base_agg <- left_join(base_agg,base %>% dplyr::select(code_muni,geometry),by="code_muni")
+base_agg<- base_agg[!duplicated(base_agg), ]
+
+# ggplot(testecodigo)+ 
+ # geom_sf(aes(geometry = geom, fill = incremento)) +
+# #   scale_fill_viridis_c(option = "plasma") + theme_bw() + labs(fill='Deforestation') 
+
+   ggplot(base_agg) +
+  geom_sf(aes(geometry = geometry,fill=as.numeric(incremento)))+
   labs(title="Deforestation per year")+
   scale_fill_distiller(palette = "Greens", limits=c(0.5, 0.8),
                        name="Code_muni")+  theme_minimal()
