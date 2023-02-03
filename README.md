@@ -36,6 +36,7 @@ As a table:
 |                           2019 |       11043.9 |
 |                           2020 |       10587.9 |
 
+
 Now looking at how this deforestation has behaved geographically since 2006:
 ![def_increase_mun](https://user-images.githubusercontent.com/51092062/216614481-030c1ccd-d2f0-4552-b77a-7e0a3ebaeac2.png)
 
