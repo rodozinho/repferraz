@@ -1,9 +1,9 @@
 ### Importing all packages
 
 if (!require("pacman")) install.packages("pacman")
-p_load(ggplot2,deflateBR, readxl, tidyverse, lubridate, sf, zoo, data.table, factoextra, ggbiplot, magrittr, grid,
-       rnaturalearth, rnaturalearthdata, rgeos,car,SciViews,scales,caret,vroom,ggpattern,maps,geobr,maptools,FNN,plm,
-       fixest,modelsummary,vtable,plm,did,Matching,formattable,sf,rgeos,MatchIt,devtools,DAPSm,did2s,cowplot,ggmap)
+p_load(ggplot2,deflateBR, readxl, tidyverse, lubridate, sf, zoo, data.table, factoextra,magrittr, grid,
+       car,scales,caret,vroom,ggpattern,maps,geobr,maptools,FNN,plm,
+       modelsummary,formattable,sf,rgeos,MatchIt,devtools,cowplot,ggmap, gt, clipr)
 
 # Cleaning the environment
    
@@ -328,6 +328,9 @@ base_map <- base_map %>% dplyr::rename(year=Group.1,def_increase=x)
 ggplot(data=base_map,aes(x=year,y=def_increase))+geom_line()+ xlab("Years") +
  ylab("Deforestation Increase")+theme_minimal() 
 
+base_map %>% gt() %>% tab_header(title="How deforestation has behaved?",subtitle = "From 2006 to 2020") %>% 
+  cols_label("year"="Year","def_increase"="Deforestation") %>% as_raw_html() %>% write_clip() # allows you to copy an output automatically (pipe friendly )
+ 
 ## hmm maybe some new maps because why not? let's see how this accumulated deforestation is geographically distributed
 base_map <- aggregate(base$incremento, by = list(base$code_muni), FUN=sum) 
 base_map <- base_map %>% dplyr::rename(muni_code=Group.1,def_increase=x)
@@ -335,6 +338,7 @@ base_map <- base_map %>% dplyr::rename(muni_code=Group.1,def_increase=x)
 lat_lon <- vroom("latitude.txt") # for all brazilian city, let's get latitude and longitude
 base_map <- left_join(base_map,lat_lon,by=c("muni_code"="codigo_ibge"))
 base_map <- base_map %>% dplyr::select(muni_code,latitude,longitude,def_increase) 
+
 
 ## another way to create maps (the easiest, in my opinion) is to get coordinates at https://www.openstreetmap.org/export#map=14/-22.9645/-43.193 and apply them below. This method  it's pretty straightforward, easy to see the boundaries wished (just limit it as you wish at openstreetmap) and it has many maptypes. However, for this kind of data, this doesn't work well, since we need "geom" to create municipalities. For that, I will also explore other ways.
 
