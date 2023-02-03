@@ -14,40 +14,33 @@ With a simple graph, let's see how deforestation has behaved in the region, sinc
 
 ![def](https://user-images.githubusercontent.com/51092062/216448491-071e5621-d084-47ef-8618-97fc915fbf31.png)
 
-As a table:
+As a table, how deforestation has behaved from 2006 to 2020?
 
-| How deforestation has behaved? |               |
-|:------------------------------:|:-------------:|
-|        From 2006 to 2020       |               |
-|                           Year | Deforestation |
-|                           2006 |       10899.4 |
-|                           2007 |       11501.9 |
-|                           2008 |       13301.7 |
-|                           2009 |        6551.6 |
-|                           2010 |        6336.2 |
-|                           2011 |        5608.2 |
-|                           2012 |        4455.7 |
-|                           2013 |        5411.0 |
-|                           2014 |        5126.7 |
-|                           2015 |        6143.7 |
-|                           2016 |        7266.8 |
-|                           2017 |        7299.2 |
-|                           2018 |        7386.0 |
-|                           2019 |       11043.9 |
-|                           2020 |       10587.9 |
+| Year | Deforestation |
+|:----:|:-------------:|
+| 2006 |    10899.4    |
+| 2007 |    11501.9    |
+| 2008 |    13301.7    |
+| 2009 |    6551.6     |
+| 2010 |    6336.2     |
+| 2011 |    5608.2     |
+| 2012 |    4455.7     |
+| 2013 |    5411.0     |
+| 2014 |    5126.7     |
+| 2015 |    6143.7     |
+| 2016 |    7266.8     |
+| 2017 |    7299.2     |
+| 2018 |    7386.0     |
+| 2019 |    11043.9    |
+| 2020 |    10587.9    |
 
+Now looking at how this deforestation has behaved geographically since 2006: ![def_increase_mun](https://user-images.githubusercontent.com/51092062/216614481-030c1ccd-d2f0-4552-b77a-7e0a3ebaeac2.png)
 
-Now looking at how this deforestation has behaved geographically since 2006:
-![def_increase_mun](https://user-images.githubusercontent.com/51092062/216614481-030c1ccd-d2f0-4552-b77a-7e0a3ebaeac2.png)
+It is easy to see the (in)famous *Brazilian agricultural frontier*: ![def_increase_mun_arch](https://user-images.githubusercontent.com/51092062/216621837-3c51c06e-1231-4acb-ab3f-9fc00f8443c9.png)
 
-It is easy to  see the (in)famous *Brazilian agricultural frontier*:
-![def_increase_mun_arch](https://user-images.githubusercontent.com/51092062/216621837-3c51c06e-1231-4acb-ab3f-9fc00f8443c9.png)
+Now let's go to the "developed world" and study the export (import, from an European country perspective) of Brazilian primary products: ![primary](https://user-images.githubusercontent.com/51092062/216446120-b742edea-fb8e-4f0d-ac59-94993944693f.png)
 
-
-Now let's go to the "developed world" and study the export (import, from an European country perspective) of Brazilian primary products:
-![primary](https://user-images.githubusercontent.com/51092062/216446120-b742edea-fb8e-4f0d-ac59-94993944693f.png)
-
-As visible, a few countries "carry" this burden, such as Spain, Netherlands, France, and Russia. Quantifying how this global chain of primary products affects deforestation directly is, however, out of the boundaries of the present exploration. Still, we can suppose (and the literature corroborates that) that, at least to some degree, the food on the plate of a Spanish comes with CO2 and biodiversity loss.      
+As visible, a few countries "carry" this burden, such as Spain, Netherlands, France, and Russia. Quantifying how this global chain of primary products affects deforestation directly is, however, out of the boundaries of the present exploration. Still, we can suppose (and the literature corroborates that) that, at least to some degree, the food on the plate of a Spanish comes with CO2 and biodiversity loss.
 
 # summit.R
 
