@@ -369,12 +369,18 @@ ggplot(base_agg) +
   geom_sf(aes(geometry = geometry,fill=as.numeric(incremento)))+
      scale_fill_viridis_c(option = "inferno") + theme_bw() + labs(fill='Deforestation increase \nsince 2006') 
    
-# lets build an arch!
+### lets build an arch to visualize the frontier
+lat_lon <- vroom("latitude.txt")
+
+arch <- lat_lon %>% filter(codigo_ibge==1505502 |codigo_ibge==1302405 ) %>% dplyr::select(latitude,longitude,codigo_ibge) %>% dplyr::rename("lon"="latitude","lat"="latitude","code_muni"="codigo_ibge") # selecting the municipalities used to create the arch on the graph. now that we have our info, we could change the df format to pivotal but is faster to create a new df by hand used the info
+
+arch <- data.frame(orig_lat=-8.26413, 
+                   orig_lon=-66.7948, 
+                   dest_lat=-3.00212,
+                   dest_lon=-47.3527) 
+
 ggplot(base_agg) +
      geom_sf(aes(geometry = geometry,fill=as.numeric(incremento)))+
-     scale_fill_viridis_c(option = "inferno") + theme_bw() + labs(fill='Deforestation increase \nsince 2006')  
-   
-ggplot(base) + 
-  geom_sf(aes(geometry = geometry,fill =incremento)) +labs(fill='Import of Brazilian primary products \nwhich usually are associated with deforestation (R$)') +
-  scale_fill_viridis_c(option = "plasma",label=scales::comma) + theme_bw()+ facet_wrap(~ano)+
-  coord_sf(xlim = c(-25,50), ylim = c(35,70), expand = FALSE)
+     scale_fill_viridis_c(option = "inferno") + theme_bw() + labs(fill='Deforestation increase \nsince 2006')  +
+  geom_curve(aes(x =orig_lon, y = orig_lat, xend = dest_lon, yend = dest_lat), data = arch, colour = "red",size=2)+ coord_sf()
+rm(arch,base_agg,lat_lon)

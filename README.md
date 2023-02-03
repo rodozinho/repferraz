@@ -18,6 +18,8 @@ Now looking at how this deforestation has behaved geographically since 2006:
 ![def_increase_mun](https://user-images.githubusercontent.com/51092062/216614481-030c1ccd-d2f0-4552-b77a-7e0a3ebaeac2.png)
 
 It is easy to  see the (in)famous *Brazilian agricultural frontier*:
+![def_increase_mun_arch](https://user-images.githubusercontent.com/51092062/216621837-3c51c06e-1231-4acb-ab3f-9fc00f8443c9.png)
+
 
 
 ![primary](https://user-images.githubusercontent.com/51092062/216446120-b742edea-fb8e-4f0d-ac59-94993944693f.png)
