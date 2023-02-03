@@ -373,7 +373,7 @@ ggplot(base_agg) +
   geom_sf(aes(geometry = geometry,fill=as.numeric(incremento)))+
      scale_fill_viridis_c(option = "inferno") + theme_bw() + labs(fill='Deforestation increase \nsince 2006') 
    
-### lets build an arch to visualize the frontier
+### lets build an arch to visualize the agro frontier
 lat_lon <- vroom("latitude.txt")
 
 arch <- lat_lon %>% filter(codigo_ibge==1505502 |codigo_ibge==1302405 ) %>% dplyr::select(latitude,longitude,codigo_ibge) %>% dplyr::rename("lon"="latitude","lat"="latitude","code_muni"="codigo_ibge") # selecting the municipalities used to create the arch on the graph. now that we have our info, we could change the df format to pivotal but is faster to create a new df by hand used the info
@@ -388,3 +388,26 @@ ggplot(base_agg) +
      scale_fill_viridis_c(option = "inferno") + theme_bw() + labs(fill='Deforestation increase \nsince 2006')  +
   geom_curve(aes(x =orig_lon, y = orig_lat, xend = dest_lon, yend = dest_lat), data = arch, colour = "red",size=2)+ coord_sf()
 rm(arch,base_agg,lat_lon)
+
+# You don't have to trust my word! Let's see where there is new soy plantations 
+municipio_lavouras<- vroom("municipio_lavouras_temporarias.csv")
+
+municipio_lavouras <- municipio_lavouras %>% filter(ano>=2006,produto=="Soja (em grão)") %>% dplyr::rename("code_muni"="id_municipio") %>% dplyr::select(code_muni,ano,area_plantada) # getting planted area
+
+municipios_AL <- read_excel("municipios_AL.xls")
+municipio_lavouras<- subset(municipio_lavouras, code_muni %in% municipios_AL$code_muni) # only municipalities inside the Legal Amazon
+rm(municipios_AL)
+
+# let's stick with municipalities that have a trend of increase of areas for soy. what I'm going to do is see for all municipalities if their trends are increasing or decreasing. if decreasing, I drop it. that way, we can, at least for these period, identify the municiaplities that are having more soy plantations. to do it, I will take the mean of the first three years and compare with the mean from the last three years.
+
+left_join(municipio_lavouras %>% group_by(code_muni) %>% dplyr::filter(ano==2006|ano==2007|ano==2008) %>% 
+    summarise(area_plantada = mean(area_plantada, na.rm = TRUE)) %>% dplyr::select(code_muni,area_plantada) %>% dplyr::rename("area_plantada_before"="area_plantada"),
+    municipio_lavouras %>% group_by(code_muni) %>% dplyr::filter(ano==2017|ano==2018|ano==2019) %>% summarise(area_plantada = mean(area_plantada, na.rm = TRUE)) %>% dplyr::select(code_muni,area_plantada))%>% dplyr::rename("area_plantada_after"="area_plantada", by=c("code_muni")) %>% mutate(reason = area_plantada_before/area_plantada_after) %>% dplyr::filter(reason<=1) %>% dplyr::rename("code_muni"="by") %>% dplyr::select(code_muni) -> municipio_lavouras # now we have a list of municipalities that had more soy in the 17 - 19 window than before.
+
+municipio_lavouras$increased_soy <- 1
+
+left_join(base,municipio_lavouras,by="code_muni") -> base
+
+ggplot(base) +
+  geom_sf(aes(geometry = geometry,fill=as.numeric(incremento)))+
+  scale_fill_viridis_c(option = "inferno") + theme_bw() + labs(fill='Soy')+scale_fill_discrete(fill=increased_soy)

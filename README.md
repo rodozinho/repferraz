@@ -14,7 +14,7 @@ With a simple graph, let's see how deforestation has behaved in the region, sinc
 
 ![def](https://user-images.githubusercontent.com/51092062/216448491-071e5621-d084-47ef-8618-97fc915fbf31.png)
 
-As a table, how deforestation has behaved from 2006 to 2020?
+As a table, how deforestation has behaved from 2006 to 2020:
 
 | Year | Deforestation |
 |:----:|:-------------:|
