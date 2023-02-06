@@ -410,6 +410,24 @@ municipio_lavouras$increased_soy <- 1
 left_join(base,municipio_lavouras,by="code_muni") -> base
 
 ggplot(base) +
-  geom_sf(aes(geometry = geometry,fill=increased_soy))+  theme_bw() + labs(fill='Soy')+
+  geom_sf(aes(geometry = geometry,fill=increased_soy))+   theme(legend.position = 'none') + labs(fill='Soy',x = "Lon",y="Lat")+
   geom_curve(aes(x =orig_lon, y = orig_lat, xend = dest_lon, yend = dest_lat), data = arch, colour = "red",linewidth=2)+ coord_sf()
+
 # arrows?
+base_agg <- aggregate(incremento ~ code_muni, data=base, FUN=sum)
+
+base_agg <- left_join(base_agg,base %>% dplyr::select(code_muni,geometry),by="code_muni")
+base_agg<- base_agg[!duplicated(base_agg), ]
+
+
+municipio_lavouras<- left_join(municipio_lavouras,base_agg,by="code_muni")
+
+ggplot(base_agg)+ 
+  geom_sf(aes(geometry = geometry, fill = incremento)) +
+  scale_fill_viridis_c(option = "inferno") +  theme(legend.position = 'none')+labs(fill='Deforestation') + 
+  geom_sf_pattern(data = municipio_lavouras, aes(geometry = geometry, fill = incremento), pattern = "stripe",  
+                  colour = 'black', pattern_density = 0.25) +
+  labs(caption="White striped municipalities are the ones who increased soy production")+
+  geom_curve(aes(x =-60, y = -15, xend = -60, yend = -9), data = arch, colour = "red",linewidth=2,arrow=arrow(length = unit(0.03, "npc")))+
+geom_curve(aes(x =-55, y = -12, xend = -55, yend = -8), data = arch, colour = "red",linewidth=2,arrow=arrow(length = unit(0.03, "npc")))+geom_curve(aes(x =-50, y = -10, xend = -50, yend = -5), data = arch, colour = "red",linewidth=2,arrow=arrow(length = unit(0.03, "npc")))
+
