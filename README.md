@@ -1,4 +1,4 @@
-# rodr
+# testing some stuff
 
 This repository contains part of my RStudio experience, i.e., my R portfolio. None of these files are pulled from my computer since the versions here are simplified.
 
