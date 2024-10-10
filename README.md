@@ -1,4 +1,3 @@
-# testing some stuff
 
 This repository contains part of my RStudio experience, i.e., my R portfolio. None of these files are pulled from my computer since the versions here are simplified.
 
@@ -53,6 +52,6 @@ As visible, a few countries "carry" this burden, such as Spain, Netherlands, Fra
 
 # summit.R
 
-The last file "summit.R" tries to see if there is some relationship between environmental conferences/summits and the raise of radical leftist perspectives regarding environmental issues.
+The last file "summit.R" tries to see if there is some relationship between environmental conferences/summits and the raise of radical leftist perspectives regarding environmental issues. I gave up because Twitter's API is paid now =/
 
 None of the .xlsx, .txt and .csv used on these codes are in the repository. If you want, you can request them to me!
